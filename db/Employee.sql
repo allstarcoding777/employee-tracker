@@ -1,3 +1,5 @@
+DROP DATABASE IF EXISTS employeesDB;
+
 CREATE DATABASE employeesDB;
 
 USE employeesDB;
@@ -16,7 +18,7 @@ CREATE TABLE role (
     title VARCHAR(40) NOT NULL,
     salary DECIMAL(10,2) NOT NULL,
     department_id INT NOT NULL,
-    PRIMARY KEY (role_id),
+    PRIMARY KEY (role_id)
 );
 
 INSERT INTO role (title, salary, department_id)
@@ -34,11 +36,11 @@ CREATE TABLE employee (
     last_name VARCHAR(40) NOT NULL,
     role_id INT NULL,
     manager_id INT NULL,
-    PRIMARY KEY (employee_id),
+    PRIMARY KEY (employee_id)
 );
 
 CREATE TABLE managers (
-    manager_id INT NOT NULL AUTO_INCREMENT,
+    manager_id INT AUTO_INCREMENT,
     manager VARCHAR(40),
-    PRIMARY KEY (manager_id),
+    PRIMARY KEY (manager_id)
 );
