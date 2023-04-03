@@ -27,8 +27,9 @@ VALUES ('Sales Manager', 120000, 1),
 ('Lead Engineer', 125000, 2),
 ('Software Engineer', 110000, 2),
 ('Accountant', 80000, 3),
-('Legal Assistant', 75000, 4),
-('Lawyer', 110000, 4);
+('Bookkeeper', 60000, 3),
+('Lawyer', 110000, 4),
+('Legal Assistant', 75000, 4);
 
 CREATE TABLE employee (
     employee_id INT NOT NULL AUTO_INCREMENT,
