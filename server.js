@@ -66,6 +66,78 @@ const getEmployees = () => {
     })
 };
 
+// function to check roles
+// SELECT will return a promise that we can use to get the data, JOIN will join the tables together
+const checkRole = `SELECT role_id, employee.first_name, employee.last_name, title, salary, department.role, managers.manager
+FROM employee
+JOIN role ON employee.role_id = role.role_id
+JOIN department ON role.department_id = department.department_id
+LEFT JOIN managers ON employee.manager_id = managers.manager_id`;
+
+// function to prompt user to choose an action
+const init = () => {
+    getEmployees();
+    getRoles();
+    getManagers();
+    inquirer.prompt({
+        name: 'action',
+        type: 'list',
+        message: 'What would you like to do?',
+        choices: [
+            'View All Employees',
+            'View All Employees By Department',
+            'View All Employees By Manager',
+            'Add Employee',
+            'Remove Employee',
+            'Update Employee Role',
+            'Update Employee Manager',
+            'View All Roles',
+            'View All Managers',
+        ],
+    })
+    // switch statement to call the function based on the user's choice
+    .then((answer) => {
+        switch (answer.action) {
+            case 'View All Employees':
+                viewAllEmployees();
+                break;
+            case 'View All Employees By Department':
+                viewAllEmployeesByDepartment();
+                break;
+            case 'View All Employees By Manager':
+                viewAllEmployeesByManager();
+                break;
+            case 'Add Employee':
+                addEmployee();
+                break;
+            case 'Remove Employee':
+                removeEmployee();
+                break;
+            case 'Update Employee Role':
+                updateEmployeeRole();
+                break;
+            case 'Update Employee Manager':
+                updateEmployeeManager();
+                break;
+            case 'View All Roles':
+                viewAllRoles();
+                break;
+            case 'View All Managers':
+                viewAllManagers();
+                break;
+            case 'Exit':
+                connection.end();
+                break;
+        }
+    });
+};
+
+
+
+
+
+
+
 
 
 
