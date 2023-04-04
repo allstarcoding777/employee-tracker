@@ -4,7 +4,7 @@
   * ## Description
   This command-line application allows a user to manage and navigate through a company's employee database.
   * ## Usage
-  Open code in terminal. Type node index.js to begin running application.
+  Open code in terminal. Type node server.js or npm start to begin running application.
   
   ![webpage screenshot](assets/images/webpage-screenshot.png)
   
