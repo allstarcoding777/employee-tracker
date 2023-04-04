@@ -81,7 +81,7 @@ const init = () => {
     getManagers();
     inquirer.prompt({
         name: 'action',
-        type: 'list',
+        type: 'rawlist',
         message: 'What would you like to do?',
         choices: [
             'View All Employees',
@@ -131,6 +131,173 @@ const init = () => {
         }
     });
 };
+
+// function to view employees by manager
+const viewAllEmployeesByManager = () => {
+    inquirer.prompt({
+        name: 'manager',
+        type: 'list',
+        message: 'Choose a manager?',
+        choices: managers,
+    }).then((answer) => {
+        connection.query('SELECT first_name, last_name, FROM employee WHERE manager_id = ${answer.manager}', (err, res) => {
+            if (err) throw err;
+            console.table(res);
+            init();
+        })
+    })
+};
+
+// function to update employee manager
+const updateEmployeeManager = () => {
+    inquirer.prompt([{
+        type: 'list',
+        name: 'employee',
+        message: 'Which employee would you like to add a new manager to?',
+        choices: employees
+    },
+    {
+        type: 'list',
+        name: 'manager',
+        message: 'Which manager would you like to assign to this employee?',
+        choices: managers
+    },
+    ]).then((answer) => {
+        connection.query('UPDATE employee SET manager_id = ${answer.manager} WHERE employee_id = ${answer.employee}', (err, res) => {
+            if (err) throw err;
+            console.log('Employee Manager Updated!');
+            init();
+        })
+    })
+};
+
+// function to update employee role
+const updateEmployeeRole = () => {
+    inquirer.prompt([{
+        type: 'list',
+        name: 'employee',
+        message: 'Which employee would you like to update?',
+        choices: employees
+    },
+    {
+        type: 'list',
+        name: 'role',
+        message: 'What is the new role for this employee?',
+        choices: roles
+    },
+    ]).then((answer) => {
+        connection.query('UPDATE employee SET role_id = ${answer.role} WHERE employee_id = ${answer.employee}', (err, res) => {
+            if (err) throw err;
+            console.log('Employee Role Updated!');
+            init();
+        })
+    })
+};
+
+// function to view all managers
+const viewAllManagers = () => {
+    connection.query('SELECT manager FROM managers', (err, res) => {
+        if (err) throw err;
+        // console.table will display the data in a table format
+        console.table(res);
+        init();
+    })
+};
+
+// function to view all employees
+const viewAllEmployees = () => {
+    connection.query(checkRole, (err, res) => {
+        if (err) throw err;
+        console.table(res);
+        init();
+    })
+};
+
+// function to view all roles
+const viewAllRoles = () => {
+    connection.query('SELECT title FROM role', (err, res) => {
+        if (err) throw err;
+        console.table(res);
+        init();
+    })
+};
+
+// function to view employees by department
+const viewAllEmployeesByDepartment = () => {
+    inquirer.prompt({
+        name: 'department',
+        type: 'list',
+        message: 'Choose a department to view.',
+        choices: departments,
+    }).then((answer) => {
+        connection.query('SELECT first_name, last_name, title FROM employee JOIN role ON employee.role_id = role.role_id WHERE department_id = ${answer.department}', (err, res) => {
+            if (err) throw err;
+            console.table(res);
+            init();
+        })
+    })
+};
+
+// function to add employee
+const addEmployee = () => {
+    inquirer.prompt([{
+        name: 'first_name',
+        type: 'input',
+        message: 'What is the employee\'s first name?',
+    },
+    {
+        name: 'last_name',
+        type: 'input',
+        message: 'What is the employee\'s last name?',
+    },
+    {
+        name: 'role',
+        type: 'list',
+        message: 'What is the employee\'s role?',
+        choices: roles,
+    },
+    {
+        name: 'manager',
+        type: 'list',
+        message: 'Who is the employee\'s manager?',
+        choices: managers,
+    },
+    ]).then((answer) => {
+        connection.query('INSERT INTO employee SET ?', {
+            first_name: answer.first_name,
+            last_name: answer.last_name,
+            role_id: answer.role,
+            manager_id: answer.manager,
+        }, (err) => {
+            if (err) throw err;
+            console.log('New Employee Added!');
+            init();
+        })
+    })
+};
+
+// function to remove employee
+const removeEmployee = () => {
+    inquirer.prompt({
+        name: 'employee',
+        type: 'list',
+        message: 'Which employee would you like to remove?',
+        choices: employees,
+    }).then((answer) => {
+        connection.query('DELETE FROM employee WHERE employee_id = ${answer.employee}', (err, res) => {
+            if (err) throw err;
+            console.log('Employee Removed!');
+            init();
+        })
+    })
+}
+
+// init function to start the application
+init()
+
+
+
+
 
 
 
