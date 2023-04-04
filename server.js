@@ -77,9 +77,9 @@ LEFT JOIN managers ON employee.manager_id = managers.manager_id`;
 
 // function to prompt user to choose an action
 const init = () => {
-    getEmployee();
-    getRole();
-    getManager();
+    // getEmployee();
+    // getRole();
+    // getManager();
     inquirer.prompt({
         name: 'init',
         type: 'rawlist',
