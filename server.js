@@ -1,7 +1,8 @@
 // require dependencies
 const mysql = require('mysql');
+const express = require('express');
 const inquirer = require('inquirer');
-const cTable = require('console.table');
+const cTables = require('console.table');
 
 // variables with empty arrays to hold data
 let managers = [];
@@ -18,7 +19,7 @@ const connection = mysql.createConnection({
 });
 
 // function to get managers from database
-const getManagers = () => {
+const getManager = () => {
     // connection.query will return a promise that we can use to get the data
     connection.query('SELECT manager, manager_id FROM managers', (err, res) => {
         // if there is an error, throw it
@@ -36,14 +37,14 @@ const getManagers = () => {
 };
 
 // function to get roles from database
-const getRoles = () => {
+const getRole = () => {
     connection.query('SELECT title, role_id FROM role', (err, res) => {
         if (err) throw err;
         roles = [];
         for (let i = 0; i < res.length; i++) {
+            const id = res[i].role_id;
             const title = res[i].title;
-            const role_id = res[i].role_id;
-            let newRole = { name: title, value: role_id }
+            let newRole = { name: title, value: id }
             roles.push(newRole);
         }
         return roles;
@@ -51,24 +52,24 @@ const getRoles = () => {
 };
 
 // function to get employees from database
-const getEmployees = () => {
+const getEmployee = () => {
     connection.query('SELECT first_name, last_name, employee_id FROM employee', (err, res) => {
         if (err) throw err;
         employees = [];
         for (let i = 0; i < res.length; i++) {
-            const first_name = res[i].first_name;
-            const last_name = res[i].last_name;
-            const employee_id = res[i].employee_id;
-            let newEmployee = { name: first_name + ' ' + last_name, value: employee_id }
+            const id = res[i].id;
+            const firstName = res[i].first_name;
+            const lastName = res[i].last_name;
+            let newEmployee = { name: firstName.concat(' ', lastName), value: id }
             employees.push(newEmployee);
         }
         return employees;
     })
-};
+}
 
 // function to check roles
 // SELECT will return a promise that we can use to get the data, JOIN will join the tables together
-const checkRole = `SELECT role_id, employee.first_name, employee.last_name, title, salary, department.role, managers.manager
+const roleCheck = `SELECT id, employee.first_name, employee.last_name, title, salary, department.role, managers.manager
 FROM employee
 JOIN role ON employee.role_id = role.role_id
 JOIN department ON role.department_id = department.department_id
@@ -76,11 +77,11 @@ LEFT JOIN managers ON employee.manager_id = managers.manager_id`;
 
 // function to prompt user to choose an action
 const init = () => {
-    getEmployees();
-    getRoles();
-    getManagers();
+    getEmployee();
+    getRole();
+    getManager();
     inquirer.prompt({
-        name: 'action',
+        name: 'init',
         type: 'rawlist',
         message: 'What would you like to do?',
         choices: [
@@ -135,15 +136,16 @@ const init = () => {
 // function to view employees by manager
 const viewAllEmployeesByManager = () => {
     inquirer.prompt({
-        name: 'manager',
         type: 'list',
-        message: 'Choose a manager?',
+        name: 'manager',
+        message: 'Choose a manager.',
         choices: managers,
     }).then((answer) => {
-        connection.query('SELECT first_name, last_name, FROM employee WHERE manager_id = ${answer.manager}', (err, res) => {
+        connection.query(`SELECT first_name, last_name FROM employee 
+        WHERE manager_id = ${answer.manager};`, (err, res) => {
             if (err) throw err;
             console.table(res);
-            init();
+            init()
         })
     })
 };
@@ -163,7 +165,8 @@ const updateEmployeeManager = () => {
         choices: managers
     },
     ]).then((answer) => {
-        connection.query('UPDATE employee SET manager_id = ${answer.manager} WHERE employee_id = ${answer.employee}', (err, res) => {
+        connection.query(`UPDATE employee SET manager_id = ${answer.manager} 
+        WHERE employee_id = ${answer.employee}`, (err, res) => {
             if (err) throw err;
             console.log('Employee Manager Updated!');
             init();
@@ -186,7 +189,9 @@ const updateEmployeeRole = () => {
         choices: roles
     },
     ]).then((answer) => {
-        connection.query('UPDATE employee SET role_id = ${answer.role} WHERE employee_id = ${answer.employee}', (err, res) => {
+        connection.query(`UPDATE employee 
+        SET role_id = ${answer.role} 
+        WHERE employee_id = ${answer.employee};`, (err, res) => {
             if (err) throw err;
             console.log('Employee Role Updated!');
             init();
@@ -196,8 +201,9 @@ const updateEmployeeRole = () => {
 
 // function to view all managers
 const viewAllManagers = () => {
-    connection.query('SELECT manager FROM managers', (err, res) => {
+    connection.query(`SELECT manager FROM managers`, (err, res) => {
         if (err) throw err;
+        console.log('\nALL MANAGERS\n')
         // console.table will display the data in a table format
         console.table(res);
         init();
@@ -206,7 +212,8 @@ const viewAllManagers = () => {
 
 // function to view all employees
 const viewAllEmployees = () => {
-    connection.query(checkRole, (err, res) => {
+    connection.query(roleCheck, (err, res) => {
+        console.log('\nALL EMPLOYEES\n');
         if (err) throw err;
         console.table(res);
         init();
@@ -215,7 +222,8 @@ const viewAllEmployees = () => {
 
 // function to view all roles
 const viewAllRoles = () => {
-    connection.query('SELECT title FROM role', (err, res) => {
+    connection.query(`SELECT title FROM role`, (err, res) => {
+        console.log('\nALL ROLES\n');
         if (err) throw err;
         console.table(res);
         init();
@@ -225,21 +233,55 @@ const viewAllRoles = () => {
 // function to view employees by department
 const viewAllEmployeesByDepartment = () => {
     inquirer.prompt({
-        name: 'department',
-        type: 'list',
-        message: 'Choose a department to view.',
-        choices: departments,
+        type: 'rawlist',
+        name: 'departments',
+        message: 'Which department would you like to view?',
+        choices: ['Engineering', 'Finance', 'Legal', 'Sales'],
     }).then((answer) => {
-        connection.query('SELECT first_name, last_name, title FROM employee JOIN role ON employee.role_id = role.role_id WHERE department_id = ${answer.department}', (err, res) => {
-            if (err) throw err;
-            console.table(res);
-            init();
-        })
-    })
+        if (answer.departments === 'Engineering') {
+            connection.query(`SELECT employee.first_name, employee.last_name FROM employee
+            JOIN role ON employee.role_id = role.role_id
+            JOIN department ON role.department_id = department.department_id and department.role = 'Engineering'`, (err, res) => {
+                console.log('\nEngineers\n');
+                if (err) throw err;
+                console.table(res);
+                init();
+            })
+        } else if (answer.departments === 'Finance') {
+            connection.query(`SELECT employee.first_name, employee.last_name FROM employee
+            JOIN role ON employee.role_id = role.role_id
+            JOIN department ON role.department_id = department.department_id and department.role = 'Finance'`, (err, res) => {
+                console.log('\nFinance\n');
+                if (err) throw err;
+                console.table(res);
+                init();
+            })
+        } else if (answer.departments === 'Legal') {
+            connection.query(`SELECT employee.first_name, employee.last_name FROM employee
+            JOIN role ON employee.role_id = role.role_id
+            JOIN department ON role.department_id = department.department_id and department.role = 'Legal'`, (err, res) => {
+                console.log('\nLegal\n');
+                if (err) throw err;
+                console.table(res);
+                init();
+            })
+        } else if (answer.departments === 'Sales') {
+            connection.query(`SELECT employee.first_name, employee.last_name FROM employee
+            JOIN role ON employee.role_id = role.role_id
+            JOIN department ON role.department_id = department.department_id and department.role = 'Sales'`, (err, res) => {
+                console.log('\nSales\n');
+                if (err) throw err;
+                console.table(res);
+                init();
+            })
+        }
+    });
 };
+
 
 // function to add employee
 const addEmployee = () => {
+    managers.push('none');
     inquirer.prompt([{
         name: 'first_name',
         type: 'input',
@@ -263,18 +305,22 @@ const addEmployee = () => {
         choices: managers,
     },
     ]).then((answer) => {
-        connection.query('INSERT INTO employee SET ?', {
-            first_name: answer.first_name,
-            last_name: answer.last_name,
-            role_id: answer.role,
-            manager_id: answer.manager,
-        }, (err) => {
-            if (err) throw err;
-            console.log('New Employee Added!');
-            init();
-        })
+        if (answer.manager === 'none') {
+            connection.query(`INSERT INTO employee (first_name, last_name, role_id, manager_id)) 
+            VALUES ('${answer.first_name}', '${answer.last_name}', ${answer.role})`, (err, res) => {
+                if (err) throw err;
+                init();
+            });
+        } 
+        else {
+            connection.query(`INSERT INTO employee (first_name, last_name, role_id, manager_id)) 
+            VALUES ('${answer.first_name}', '${answer.last_name}', ${answer.role}, ${answer.manager})`, (err, res) => {
+                if (err) throw err;
+                init();
+            })
+        }
     })
-};
+}
 
 // function to remove employee
 const removeEmployee = () => {
@@ -284,11 +330,12 @@ const removeEmployee = () => {
         message: 'Which employee would you like to remove?',
         choices: employees,
     }).then((answer) => {
-        connection.query('DELETE FROM employee WHERE employee_id = ${answer.employee}', (err, res) => {
+        connection.query(`DELETE FROM employee WHERE id = ${answer.employee}`, (err, res) => {
             if (err) throw err;
             console.log('Employee Removed!');
             init();
         })
+        console.log(answer)
     })
 }
 
