@@ -441,7 +441,7 @@ const removeEmployee = () => {
     });
 };
 
-// makes sure the connection is working
+// waits for the connection to be made before starting the application
 connection.connect((err) => {
     if (err) throw err;
     
