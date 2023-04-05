@@ -9,7 +9,7 @@
   ![webpage screenshot](assets/images/webpage-screenshot.png)
   
   * ## Demo
-  Check out my demonstration of this app [HERE](https://drive.google.com/)
+  Check out my demonstration of this app [HERE](https://drive.google.com/file/d/1UzR9BMaY9aWT7dmO09_iyJ78GFzzKAWT/view)
   * ## Github Repository
   https://github.com/allstarcoding777/employee-tracker
   * ## License
