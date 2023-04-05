@@ -1,23 +1,23 @@
-DROP DATABASE IF EXISTS employeesDB;
+DROP DATABASE IF EXISTS employees_db;
 
-CREATE DATABASE employeesDB;
+CREATE DATABASE employees_db;
 
-USE employeesDB;
+USE employees_db;
 
 CREATE TABLE department (
-    department_id INT NOT NULL AUTO_INCREMENT,
-    role VARCHAR(40) NOT NULL,
+    department_id INT AUTO_INCREMENT,
+    role VARCHAR(40),
     PRIMARY KEY (department_id)
 );
 
-INSERT INTO department (role) 
+INSERT INTO department(role) 
 VALUES ('Sales'), ('Engineering'), ('Finance'), ('Legal');
 
 CREATE TABLE role (
     role_id INT NOT NULL AUTO_INCREMENT,
-    title VARCHAR(40) NOT NULL,
-    salary DECIMAL(10,2) NOT NULL,
-    department_id INT NOT NULL,
+    title VARCHAR(40),
+    salary DECIMAL(10,2),
+    department_id INT,
     PRIMARY KEY (role_id)
 );
 
@@ -32,12 +32,12 @@ VALUES ('Sales Manager', 120000, 1),
 ('Legal Assistant', 75000, 4);
 
 CREATE TABLE employee (
-    employee_id INT NOT NULL AUTO_INCREMENT,
-    first_name VARCHAR(40) NOT NULL,
-    last_name VARCHAR(40) NOT NULL,
+    id INT AUTO_INCREMENT,
+    first_name VARCHAR(40),
+    last_name VARCHAR(40),
     role_id INT NULL,
     manager_id INT NULL,
-    PRIMARY KEY (employee_id)
+    PRIMARY KEY (id)
 );
 
 CREATE TABLE managers (

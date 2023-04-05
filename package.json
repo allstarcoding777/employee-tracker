@@ -4,26 +4,26 @@
     "description": "view data about employees, roles, and departments",
     "main": "server.js",
     "scripts": {
-      "test": "echo \"Error: no test specified\" && exit 1",
-      "start": "node server.js",
-      "watch": "nodemon server.js"
+        "test": "echo \"Error: no test specified\" && exit 1",
+        "start": "node server.js",
+        "watch": "nodemon server.js"
     },
     "repository": {
-      "type": "git",
-      "url": "git+https://github.com/allstarcoding777/employee-tracker.git"
+        "type": "git",
+        "url": "git+https://github.com/allstarcoding777/employee-tracker.git"
     },
     "keywords": [],
     "author": "",
     "license": "ISC",
     "bugs": {
-      "url": "https://github.com/allstarcoding777/employee-tracker/issues"
+        "url": "https://github.com/allstarcoding777/employee-tracker/issues"
     },
     "homepage": "https://github.com/allstarcoding777/employee-tracker#readme",
     "dependencies": {
-      "console.table": "^0.10.0",
-      "inquirer": "^8.1.2",
-      "mysql": "^2.18.1",
-      "node": "^16.5.0",
-      "nodemon": "^2.0.12"
+        "console.table": "^0.10.0",
+        "inquirer": "^8.1.2",
+        "mysql": "^2.18.1",
+        "node": "^16.5.0",
+        "nodemon": "^2.0.12"
     }
-  }
+}
